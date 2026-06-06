@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reflektion – Upgrade Wochenende EC Herrenberg</title>
+  <style>
+    :root {
+      --green:  #92c355;
+      --dark:   #282925;
+      --peach:  #fac189;
+      --cream:  #f8f5f4;
+      --white:  #ffffff;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--cream); color: var(--dark); min-height: 100vh; }
+
+    header { background: var(--dark); color: var(--white); padding: 32px 24px 24px; text-align: center; }
+    header .tag { display: inline-block; background: var(--green); color: var(--dark); font-weight: 700; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; }
+    header h1 { font-size: clamp(20px, 5vw, 28px); font-weight: 800; line-height: 1.25; }
+    header p  { margin-top: 8px; font-size: 14px; opacity: .7; }
+
+    #progress-wrap { background: rgba(255,255,255,.15); height: 4px; }
+    #progress-bar  { background: var(--green); height: 4px; width: 0%; transition: width .4s ease; }
+    #progress-text { text-align: center; font-size: 12px; color: #aaa; margin: 20px 0 8px; }
+
+    main { max-width: 660px; margin: 0 auto; padding: 8px 20px 80px; }
+
+    .question { background: var(--white); border-radius: var(--radius); padding: 22px 24px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .question .num { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
+    .question h2   { font-size: 16px; font-weight: 700; line-height: 1.45; margin-bottom: 5px; }
+    .question .sub { font-size: 13px; color: #999; margin-bottom: 16px; line-height: 1.4; }
+
+    /* STARS */
+    .stars { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 6px; margin: 4px 0 2px; }
+    .stars input { display: none; }
+    .stars label { font-size: 36px; cursor: pointer; color: #ddd; transition: color .15s; user-select: none; }
+    .stars input:checked + label,
+    .stars input:checked + label ~ label { color: var(--peach); }
+    .stars label:hover,
+    .stars label:hover ~ label { color: var(--peach); opacity: .7; }
+
+    /* SCALE */
+    .scale { display: flex; gap: 7px; }
+    .scale input { display: none; }
+    .scale label { flex: 1; text-align: center; padding: 13px 0; border: 2px solid #e5e5e5; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer; transition: all .18s; user-select: none; }
+    .scale input:checked + label { background: var(--green); border-color: var(--green); color: var(--dark); }
+    .scale label:hover { border-color: var(--green); }
+    .scale-labels { display: flex; justify-content: space-between; font-size: 11px; color: #bbb; margin-top: 7px; }
+
+    /* RADIO */
+    .radio-group { display: flex; flex-direction: column; gap: 9px; }
+    .radio-group input[type=radio] { display: none; }
+    .radio-group label { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border: 2px solid #e5e5e5; border-radius: 10px; cursor: pointer; font-size: 15px; transition: all .18s; user-select: none; line-height: 1.4; }
+    .radio-group label::before { content: ''; width: 18px; height: 18px; min-width: 18px; border-radius: 50%; border: 2px solid #ccc; margin-top: 2px; transition: all .18s; }
+    .radio-group input[type=radio]:checked + label { border-color: var(--green); background: #f0f9e8; }
+    .radio-group input[type=radio]:checked + label::before { background: var(--green); border-color: var(--green); }
+
+    /* SONSTIGES */
+    .sonstiges-wrap { display: none; width: 100%; margin-top: 8px; }
+    input[type=radio][value="sonstiges"]:checked + label + .sonstiges-wrap,
+    input[type=radio][value="sonstiges"]:checked ~ .sonstiges-wrap { display: block; }
+    .sonstiges-input { width: 100%; border: 2px solid var(--green); border-radius: 8px; padding: 9px 12px; font-family: inherit; font-size: 14px; color: var(--dark); background: var(--cream); }
+    .sonstiges-input:focus { outline: none; }
+
+    /* TEXTAREA */
+    textarea { width: 100%; border: 2px solid #e5e5e5; border-radius: 10px; padding: 12px 14px; font-family: inherit; font-size: 15px; color: var(--dark); resize: vertical; min-height: 85px; transition: border-color .2s; background: var(--cream); }
+    textarea:focus { outline: none; border-color: var(--green); }
+
+    /* SECTION */
+    .section-label { display: flex; align-items: center; gap: 10px; margin: 26px 0 12px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; }
+    .section-label::before, .section-label::after { content: ''; flex: 1; height: 1px; background: #e5e5e5; }
+
+    /* FUN CARD */
+    .fun { background: var(--dark) !important; border: 3px solid var(--green); }
+    .fun .num { color: var(--peach) !important; }
+    .fun h2   { color: var(--white); }
+    .fun .sub { color: rgba(255,255,255,.6) !important; }
+    .fun .radio-group label { border-color: rgba(255,255,255,.2); color: var(--white); background: rgba(255,255,255,.05); }
+    .fun .radio-group label::before { border-color: rgba(255,255,255,.4); }
+    .fun .radio-group input:checked + label { border-color: var(--green); background: rgba(146,195,85,.2); }
+    .fun .radio-group input:checked + label::before { background: var(--green); border-color: var(--green); }
+
+    /* SUBMIT */
+    .submit-wrap { text-align: center; margin-top: 30px; }
+    button[type="submit"] { background: var(--green); color: var(--dark); font-weight: 800; font-size: 16px; padding: 16px 52px; border: none; border-radius: 50px; cursor: pointer; transition: transform .15s, box-shadow .15s; }
+    button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(146,195,85,.45); }
+    button[type="submit"]:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    #thank-you { display: none; text-align: center; padding: 64px 24px; }
+    #thank-you .icon { font-size: 64px; margin-bottom: 20px; }
+    #thank-you h2 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+    #thank-you p  { font-size: 16px; color: #777; max-width: 380px; margin: 0 auto; line-height: 1.6; }
+
+    footer { text-align: center; padding: 20px; font-size: 12px; color: #ccc; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="tag">EC Herrenberg · Juni 2026</div>
+  <h1>Reflektion – Upgrade Wochenende</h1>
+  <p>Fr. 5. &amp; Sa. 6. Juni 2026 · ca. 3–4 Minuten</p>
+</header>
+<div id="progress-wrap"><div id="progress-bar"></div></div>
+
+<main>
+  <p id="progress-text">0 von 15 beantwortet</p>
+  <form id="survey-form">
+
+    <!-- 1 GESAMT -->
+    <div class="question">
+      <div class="num">Frage 1 von 15</div>
+      <h2>Wie viele Sterne gibst du dem Wochenende?</h2>
+      <p class="sub">Dein erster, ehrlicher Gesamteindruck</p>
+      <div class="stars">
+        <input type="radio" name="q01_gesamt" id="q01_5" value="5" required><label for="q01_5">★</label>
+        <input type="radio" name="q01_gesamt" id="q01_4" value="4"><label for="q01_4">★</label>
+        <input type="radio" name="q01_gesamt" id="q01_3" value="3"><label for="q01_3">★</label>
+        <input type="radio" name="q01_gesamt" id="q01_2" value="2"><label for="q01_2">★</label>
+        <input type="radio" name="q01_gesamt" id="q01_1" value="1"><label for="q01_1">★</label>
+      </div>
+    </div>
+
+    <div class="section-label">Freitagabend</div>
+
+    <!-- 2 LÄNGE FREITAG -->
+    <div class="question">
+      <div class="num">Frage 2 von 15</div>
+      <h2>Der Freitagabend war …</h2>
+      <div class="radio-group">
+        <input type="radio" name="q02_laenge_fr" id="q02_1" value="zu kurz" required><label for="q02_1">zu kurz – ich war gerade warm</label>
+        <input type="radio" name="q02_laenge_fr" id="q02_2" value="genau richtig"><label for="q02_2">genau richtig</label>
+        <input type="radio" name="q02_laenge_fr" id="q02_3" value="zu lang"><label for="q02_3">zu lang – hat gezogen</label>
+      </div>
+    </div>
+
+    <!-- 3 WISSENSINPUT -->
+    <div class="question">
+      <div class="num">Frage 3 von 15</div>
+      <h2>Der Wissensinput (JA4D, EC Geschichte, Strukturen) hat mir neue Perspektiven gegeben.</h2>
+      <p class="sub">1 = stimme gar nicht zu · 5 = stimme voll zu</p>
+      <div class="scale">
+        <input type="radio" name="q03_wissensinput" id="q03_1" value="1" required><label for="q03_1">1</label>
+        <input type="radio" name="q03_wissensinput" id="q03_2" value="2"><label for="q03_2">2</label>
+        <input type="radio" name="q03_wissensinput" id="q03_3" value="3"><label for="q03_3">3</label>
+        <input type="radio" name="q03_wissensinput" id="q03_4" value="4"><label for="q03_4">4</label>
+        <input type="radio" name="q03_wissensinput" id="q03_5" value="5"><label for="q03_5">5</label>
+      </div>
+      <div class="scale-labels"><span>stimme gar nicht zu</span><span>stimme voll zu</span></div>
+    </div>
+
+    <!-- 4 HÖREN & VERSTEHEN -->
+    <div class="question">
+      <div class="num">Frage 4 von 15</div>
+      <h2>Die gemischten Kleingruppen beim Hören &amp; Verstehen haben mir geholfen, das Gehörte wirklich zu durchdenken.</h2>
+      <div class="scale">
+        <input type="radio" name="q04_hoeren" id="q04_1" value="1" required><label for="q04_1">1</label>
+        <input type="radio" name="q04_hoeren" id="q04_2" value="2"><label for="q04_2">2</label>
+        <input type="radio" name="q04_hoeren" id="q04_3" value="3"><label for="q04_3">3</label>
+        <input type="radio" name="q04_hoeren" id="q04_4" value="4"><label for="q04_4">4</label>
+        <input type="radio" name="q04_hoeren" id="q04_5" value="5"><label for="q04_5">5</label>
+      </div>
+      <div class="scale-labels"><span>stimme gar nicht zu</span><span>stimme voll zu</span></div>
+    </div>
+
+    <div class="section-label">Samstag</div>
+
+    <!-- 5 VISIONÄRE STORY – METHODE -->
+    <div class="question">
+      <div class="num">Frage 5 von 15</div>
+      <h2>Wie gut hat die Methode der Visionären Story zu dir gepasst?</h2>
+      <p class="sub">Eine ideale KiJu als Top-Spielfilm-Grafik malen – Szene die auf jeden Fall vorkommt</p>
+      <div class="radio-group">
+        <input type="radio" name="q05_vision_methode" id="q05_1" value="sehr gut – das ist genau mein Ding" required><label for="q05_1">sehr gut – das ist genau mein Ding 🎨</label>
+        <input type="radio" name="q05_vision_methode" id="q05_2" value="gut, hat funktioniert"><label for="q05_2">gut, hat funktioniert</label>
+        <input type="radio" name="q05_vision_methode" id="q05_3" value="okay – ich brauch sowas um in Gang zu kommen"><label for="q05_3">okay – ich brauch sowas um in Gang zu kommen</label>
+        <input type="radio" name="q05_vision_methode" id="q05_4" value="eher nicht meins – lieber anders"><label for="q05_4">eher nicht meins – lieber anders</label>
+        <input type="radio" name="q05_vision_methode" id="q05_s" value="sonstiges"><label for="q05_s">Sonstiges</label>
+        <div class="sonstiges-wrap"><input class="sonstiges-input" type="text" name="q05_vision_methode_sonstiges" placeholder="Deine Antwort …"></div>
+      </div>
+    </div>
+
+    <!-- 6 VISIONÄRE STORY – SINN -->
+    <div class="question">
+      <div class="num">Frage 6 von 15</div>
+      <h2>Hat dir die Visionäre Story geholfen, wirklich visionär zu denken und Neues zuzulassen?</h2>
+      <p class="sub">Darum ging es in dieser Phase – weg vom Ist-Zustand, hin zu echten Träumen</p>
+      <div class="radio-group">
+        <input type="radio" name="q06_vision_sinn" id="q06_1" value="ja, ich hab wirklich neu gedacht" required><label for="q06_1">ja, ich hab wirklich neu gedacht ✨</label>
+        <input type="radio" name="q06_vision_sinn" id="q06_2" value="eher ja – aber es hat ein bisschen gedauert"><label for="q06_2">eher ja – aber es hat etwas gedauert</label>
+        <input type="radio" name="q06_vision_sinn" id="q06_3" value="ich bin nicht so richtig reingekommen"><label for="q06_3">ich bin nicht so richtig reingekommen</label>
+        <input type="radio" name="q06_vision_sinn" id="q06_4" value="eher nein – hat mich nicht weit gebracht"><label for="q06_4">eher nein – hat mich nicht weit gebracht</label>
+      </div>
+    </div>
+
+    <!-- 7 EXPERIMENT / MODELL -->
+    <div class="question">
+      <div class="num">Frage 7 von 15</div>
+      <h2>Mein eigenes Experiment / Modell auf DIN-A3 zu entwickeln war …</h2>
+      <div class="radio-group">
+        <input type="radio" name="q07_experiment" id="q07_1" value="der stärkste Moment des Wochenendes" required><label for="q07_1">der stärkste Moment des Wochenendes 💡</label>
+        <input type="radio" name="q07_experiment" id="q07_2" value="hilfreich und klärend"><label for="q07_2">hilfreich und klärend</label>
+        <input type="radio" name="q07_experiment" id="q07_3" value="okay, aber nicht besonders"><label for="q07_3">okay, aber nicht besonders</label>
+        <input type="radio" name="q07_experiment" id="q07_4" value="schwierig – ich wusste nicht, wo ich anfangen soll"><label for="q07_4">schwierig – ich wusste nicht, wo ich anfangen soll</label>
+        <input type="radio" name="q07_experiment" id="q07_s" value="sonstiges"><label for="q07_s">Sonstiges</label>
+        <div class="sonstiges-wrap"><input class="sonstiges-input" type="text" name="q07_experiment_sonstiges" placeholder="Deine Antwort …"></div>
+      </div>
+    </div>
+
+    <!-- 8 KOMBINIEREN -->
+    <div class="question">
+      <div class="num">Frage 8 von 15</div>
+      <h2>Das Zusammenführen unserer Experimente in der Gruppe …</h2>
+      <div class="radio-group">
+        <input type="radio" name="q08_kombinieren" id="q08_1" value="war der Höhepunkt – da ist wirklich was entstanden" required><label for="q08_1">war der Höhepunkt – da ist wirklich was entstanden ✨</label>
+        <input type="radio" name="q08_kombinieren" id="q08_2" value="hat funktioniert"><label for="q08_2">hat funktioniert</label>
+        <input type="radio" name="q08_kombinieren" id="q08_3" value="war mühsam, aber nötig"><label for="q08_3">war mühsam, aber nötig</label>
+        <input type="radio" name="q08_kombinieren" id="q08_4" value="hätte kürzer sein können"><label for="q08_4">hätte kürzer sein können</label>
+        <input type="radio" name="q08_kombinieren" id="q08_5" value="hätten mehr Zeit oder Anleitung gebraucht"><label for="q08_5">hätten mehr Zeit oder Anleitung gebraucht</label>
+        <input type="radio" name="q08_kombinieren" id="q08_s" value="sonstiges"><label for="q08_s">Sonstiges</label>
+        <div class="sonstiges-wrap"><input class="sonstiges-input" type="text" name="q08_kombinieren_sonstiges" placeholder="Deine Antwort …"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Allgemein</div>
+
+    <!-- 9→10 MEINUNG (allgemein, übers ganze WE) -->
+    <div class="question">
+      <div class="num">Frage 9 von 15</div>
+      <h2>Ich hatte das Gefühl, dass meine Perspektive übers gesamte Wochenende gehört und einbezogen wurde.</h2>
+      <p class="sub">Nicht nur in den Diskussionen – generell</p>
+      <div class="scale">
+        <input type="radio" name="q10_meinung" id="q10_1" value="1" required><label for="q10_1">1</label>
+        <input type="radio" name="q10_meinung" id="q10_2" value="2"><label for="q10_2">2</label>
+        <input type="radio" name="q10_meinung" id="q10_3" value="3"><label for="q10_3">3</label>
+        <input type="radio" name="q10_meinung" id="q10_4" value="4"><label for="q10_4">4</label>
+        <input type="radio" name="q10_meinung" id="q10_5" value="5"><label for="q10_5">5</label>
+      </div>
+      <div class="scale-labels"><span>stimme gar nicht zu</span><span>stimme voll zu</span></div>
+    </div>
+
+    <!-- 11 PHASEN -->
+    <div class="question">
+      <div class="num">Frage 10 von 15</div>
+      <h2>Ich wusste zu jedem Zeitpunkt, warum wir das gerade machen.</h2>
+      <div class="scale">
+        <input type="radio" name="q11_phasen" id="q11_1" value="1" required><label for="q11_1">1</label>
+        <input type="radio" name="q11_phasen" id="q11_2" value="2"><label for="q11_2">2</label>
+        <input type="radio" name="q11_phasen" id="q11_3" value="3"><label for="q11_3">3</label>
+        <input type="radio" name="q11_phasen" id="q11_4" value="4"><label for="q11_4">4</label>
+        <input type="radio" name="q11_phasen" id="q11_5" value="5"><label for="q11_5">5</label>
+      </div>
+      <div class="scale-labels"><span>gar nicht</span><span>jederzeit</span></div>
+    </div>
+
+    <!-- 9 DISKUSSION (nach 11) -->
+    <div class="question">
+      <div class="num">Frage 11 von 15</div>
+      <h2>Bei den längeren offenen Diskussionen in der Gruppe dachte ich …</h2>
+      <p class="sub">z.B. beim Kombinieren oder bei den Meilensteinen</p>
+      <div class="radio-group">
+        <input type="radio" name="q09_diskussion" id="q09_1" value="genau so soll das sein" required><label for="q09_1">genau so soll das sein 👍</label>
+        <input type="radio" name="q09_diskussion" id="q09_2" value="mehr Moderation wäre gut gewesen"><label for="q09_2">mehr Moderation wäre gut gewesen</label>
+        <input type="radio" name="q09_diskussion" id="q09_3" value="lieber kürzer und klarer strukturiert"><label for="q09_3">lieber kürzer und klarer strukturiert</label>
+        <input type="radio" name="q09_diskussion" id="q09_4" value="ruhig noch mehr Zeit zum Selbst-Diskutieren"><label for="q09_4">ruhig noch mehr Zeit zum selbst Diskutieren</label>
+      </div>
+    </div>
+
+    <!-- 12 MITTAGSPAUSE -->
+    <div class="question">
+      <div class="num">Frage 12 von 15</div>
+      <h2>Die Mittagspause – Zeitpunkt und Länge – war …</h2>
+      <div class="radio-group">
+        <input type="radio" name="q12_mittag" id="q12_1" value="zu früh oder zu kurz" required><label for="q12_1">zu früh oder zu kurz</label>
+        <input type="radio" name="q12_mittag" id="q12_2" value="genau richtig"><label for="q12_2">genau richtig</label>
+        <input type="radio" name="q12_mittag" id="q12_3" value="zu spät oder zu lang"><label for="q12_3">zu spät oder zu lang</label>
+      </div>
+    </div>
+
+    <!-- 13 ABSCHLUSS -->
+    <div class="question">
+      <div class="num">Frage 13 von 15</div>
+      <h2>Das Wochenende hat sich am Ende …</h2>
+      <div class="radio-group">
+        <input type="radio" name="q13_abschluss" id="q13_1" value="abgerundet und vollständig angefühlt" required><label for="q13_1">abgerundet und vollständig angefühlt</label>
+        <input type="radio" name="q13_abschluss" id="q13_2" value="okay, aber ein bisschen offen"><label for="q13_2">okay, aber ein bisschen offen</label>
+        <input type="radio" name="q13_abschluss" id="q13_3" value="zu abrupt geendet"><label for="q13_3">zu abrupt geendet</label>
+      </div>
+    </div>
+
+    <!-- 14 ENERGIE -->
+    <div class="question">
+      <div class="num">Frage 14 von 15</div>
+      <h2>Ich verlasse das Wochenende …</h2>
+      <div class="radio-group">
+        <input type="radio" name="q14_energie" id="q14_1" value="erschöpft und ausgelaugt" required><label for="q14_1">erschöpft und ausgelaugt 😮‍💨</label>
+        <input type="radio" name="q14_energie" id="q14_2" value="neutral"><label for="q14_2">neutral</label>
+        <input type="radio" name="q14_energie" id="q14_3" value="motiviert und zuversichtlich"><label for="q14_3">motiviert und zuversichtlich 💪</label>
+        <input type="radio" name="q14_energie" id="q14_4" value="begeistert – ich will sofort loslegen"><label for="q14_4">begeistert – ich will sofort loslegen 🔥</label>
+        <input type="radio" name="q14_energie" id="q14_s" value="sonstiges"><label for="q14_s">Sonstiges</label>
+        <div class="sonstiges-wrap"><input class="sonstiges-input" type="text" name="q14_energie_sonstiges" placeholder="Deine Antwort …"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Offene Fragen</div>
+
+    <div class="question">
+      <div class="num">Bonus 1</div>
+      <h2>Wenn ein anderer EC fragt: „Lohnt sich so ein Wochenende?" – was sagst du?</h2>
+      <textarea name="q16_empfehlung" placeholder="Deine ehrliche Antwort …" rows="3"></textarea>
+    </div>
+
+    <div class="question">
+      <div class="num">Bonus 2</div>
+      <h2>Ein Tipp für andere ECs, die so ein Wochenende planen:</h2>
+      <textarea name="q17_tipp" placeholder="Was sollten sie wissen oder anders machen?" rows="3"></textarea>
+    </div>
+
+    <!-- 15 🎉 SPASSFRAGE -->
+    <div class="section-label">Das Wichtigste zum Schluss</div>
+
+    <div class="question fun">
+      <div class="num">🎉 Frage 15 von 15</div>
+      <h2>Hat dir das Super Mega High Five genauso viel Spaß gemacht wie Steffi?</h2>
+      <p class="sub">Die wichtigste Frage des gesamten Wochenendes.</p>
+      <div class="radio-group">
+        <input type="radio" name="q15_highfive" id="q15_1" value="mehr – ich hab Steffi übertrumpft" required><label for="q15_1">mehr – ich hab Steffi übertrumpft 🏆</label>
+        <input type="radio" name="q15_highfive" id="q15_2" value="genau gleich viel – wir waren synchron"><label for="q15_2">genau gleich viel 🙌</label>
+        <input type="radio" name="q15_highfive" id="q15_3" value="weniger – aber ich übe noch"><label for="q15_3">weniger – aber ich übe noch 😅</label>
+        <input type="radio" name="q15_highfive" id="q15_4" value="ich hab so getan als ob"><label for="q15_4">ich hab so getan als ob... 🎭</label>
+        <input type="radio" name="q15_highfive" id="q15_5" value="Was ist ein Super Mega High Five?"><label for="q15_5">Was ist ein Super Mega High Five?! 🤔</label>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button type="submit" id="submit-btn">Abschicken &amp; speichern 💾</button>
+    </div>
+
+  </form>
+
+  <div id="thank-you">
+    <div class="icon">🎉</div>
+    <h2>Danke!</h2>
+    <p>Dein Feedback hilft dabei, zukünftige Upgrade-Wochenenden noch besser zu gestalten.<br><br>„Vision ohne Aktion ist ein Tagtraum. Aktion ohne Vision ist ein Albtraum." – ihr habt heute beides gemacht.</p>
+  </div>
+</main>
+
+<footer>Upgrade Wochenende EC Herrenberg · 5.–6. Juni 2026</footer>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE SETUP
+     1. https://console.firebase.google.com → Neues Projekt
+     2. Realtime Database aktivieren (Testmodus, 30 Tage)
+     3. Projekteinstellungen → Web-App → Config kopieren
+     4. Werte unten ersetzen
+     5. Datei auf GitHub → GitHub Pages aktivieren → fertig!
+     ═══════════════════════════════════════════════════════════ -->
+<script type="module">
+  import { initializeApp }          from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+
+  // ↓↓↓ DEINE FIREBASE-KONFIGURATION HIER EINFÜGEN ↓↓↓
+  const firebaseConfig = {
+    apiKey:            "AIzaSyAitCArz2mYdu7dq_cYKqBOB9HNhSRauko",
+    authDomain:        "ec-herrenberg-umfrage.firebaseapp.com",
+    databaseURL:       "https://ec-herrenberg-umfrage-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:         "ec-herrenberg-umfrage",
+    storageBucket:     "ec-herrenberg-umfrage.firebasestorage.app",
+    messagingSenderId: "17922367846",
+    appId:             "1:17922367846:web:9f35d5d72b4959c480e8a7"
+  };
+  // ↑↑↑ BIS HIER ↑↑↑
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  const form    = document.getElementById("survey-form");
+  const bar     = document.getElementById("progress-bar");
+  const counter = document.getElementById("progress-text");
+  const TOTAL   = 15;
+
+  // Sonstiges-Felder ein-/ausblenden
+  document.querySelectorAll("input[type=radio][value='sonstiges']").forEach(radio => {
+    radio.addEventListener("change", () => {
+      const wrap = radio.parentElement.querySelector(".sonstiges-wrap");
+      if (wrap) { wrap.style.display = "block"; wrap.querySelector("input").focus(); }
+    });
+    // Andere Optionen in derselben Gruppe → Sonstiges ausblenden
+    const name = radio.name;
+    document.querySelectorAll(`input[type=radio][name="${name}"]`).forEach(other => {
+      if (other !== radio) {
+        other.addEventListener("change", () => {
+          const wrap = radio.parentElement.querySelector(".sonstiges-wrap");
+          if (wrap) wrap.style.display = "none";
+        });
+      }
+    });
+  });
+
+  function updateProgress() {
+    const answered = new Set();
+    form.querySelectorAll("input[type=radio]:checked").forEach(el => {
+      if (el.value !== "sonstiges") answered.add(el.name);
+      else {
+        const wrap = el.parentElement.querySelector(".sonstiges-wrap input");
+        if (wrap?.value.trim()) answered.add(el.name);
+      }
+    });
+    form.querySelectorAll("textarea").forEach(el => { if (el.value.trim()) answered.add(el.name); });
+    const n = Math.min([...answered].filter(k => !k.startsWith("q16") && !k.startsWith("q17")).length, TOTAL);
+    bar.style.width = Math.round((n / TOTAL) * 100) + "%";
+    counter.textContent = `${n} von ${TOTAL} beantwortet`;
+  }
+
+  form.querySelectorAll("input, textarea").forEach(el => {
+    el.addEventListener("change", updateProgress);
+    el.addEventListener("input",  updateProgress);
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("submit-btn");
+    btn.disabled = true;
+    btn.textContent = "Wird gespeichert …";
+
+    const get = n => {
+      const el = form.elements[n];
+      if (!el) return "";
+      if (el.value === "sonstiges") {
+        return form.elements[n + "_sonstiges"]?.value || "sonstiges";
+      }
+      return el.value || "";
+    };
+
+    const data = {
+      timestamp:              new Date().toISOString(),
+      q01_gesamt:             get("q01_gesamt"),
+      q02_laenge_fr:          get("q02_laenge_fr"),
+      q03_wissensinput:       get("q03_wissensinput"),
+      q04_hoeren:             get("q04_hoeren"),
+      q05_vision_methode:     get("q05_vision_methode"),
+      q06_vision_sinn:        get("q06_vision_sinn"),
+      q07_experiment:         get("q07_experiment"),
+      q08_kombinieren:        get("q08_kombinieren"),
+      q09_diskussion:         get("q09_diskussion"),
+      q10_meinung:            get("q10_meinung"),
+      q11_phasen:             get("q11_phasen"),
+      q12_mittag:             get("q12_mittag"),
+      q13_abschluss:          get("q13_abschluss"),
+      q14_energie:            get("q14_energie"),
+      q15_highfive:           get("q15_highfive"),
+      q16_empfehlung:         form.elements["q16_empfehlung"]?.value || "",
+      q17_tipp:               form.elements["q17_tipp"]?.value || "",
+    };
+
+    try {
+      await push(ref(db, "antworten"), data);
+      form.style.display = "none";
+      document.getElementById("thank-you").style.display = "block";
+      bar.style.width = "100%";
+      counter.textContent = "Fertig! Danke 🎉";
+    } catch (err) {
+      console.error(err);
+      btn.disabled = false;
+      btn.textContent = "Fehler – nochmal versuchen";
+      alert("Speichern fehlgeschlagen. Firebase-Konfiguration prüfen.");
+    }
+  });
+</script>
+</body>
+</html>
